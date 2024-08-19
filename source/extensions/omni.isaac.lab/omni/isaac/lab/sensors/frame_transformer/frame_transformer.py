@@ -156,6 +156,7 @@ class FrameTransformer(SensorBase):
         # First element is None because source frame offset is handled separately
         frame_offsets = [None] + [target_frame.offset for target_frame in self.cfg.target_frames]
         for frame, prim_path, offset in zip(frames, frame_prim_paths, frame_offsets):
+            print(f"Frame: {frame}, Prim Path: {prim_path}, Offset: {offset}")
             # Find correct prim
             matching_prims = sim_utils.find_matching_prims(prim_path)
             if len(matching_prims) == 0:
@@ -164,6 +165,7 @@ class FrameTransformer(SensorBase):
                     " No matching prims were found."
                 )
             for prim in matching_prims:
+                print(f"Matching Prim: {prim}")
                 # Get the prim path of the matching prim
                 matching_prim_path = prim.GetPath().pathString
                 # Check if it is a rigid prim
@@ -177,6 +179,8 @@ class FrameTransformer(SensorBase):
                 body_name = matching_prim_path.rsplit("/", 1)[-1]
                 # Use body name if frame isn't specified by user
                 frame_name = frame if frame is not None else body_name
+
+                print(f"Frame Name: {frame_name}, Body Name: {body_name}")
 
                 # Keep track of which frames are associated with which bodies
                 if body_name in body_names_to_frames:
@@ -207,9 +211,12 @@ class FrameTransformer(SensorBase):
 
         # The names of bodies that RigidPrimView will be tracking to later extract transforms from
         tracked_body_names = list(body_names_to_frames.keys())
+
+        print(f"Tracked Body Names: {tracked_body_names}")
         # Construct regex expression for the body names
         body_names_regex = r"(" + "|".join(tracked_body_names) + r")"
-        body_names_regex = f"{self.cfg.prim_path.rsplit('/', 1)[0]}/{body_names_regex}"
+        body_names_regex = f"{self.cfg.prim_path.rsplit('/', 2)[0]}/{body_names_regex}"
+        print(f"body_names_regex: {body_names_regex}")
         # Create simulation view
         self._physics_sim_view = physx.create_simulation_view(self._backend)
         self._physics_sim_view.set_subspace_roots("/")
@@ -220,6 +227,8 @@ class FrameTransformer(SensorBase):
         # Determine the order in which regex evaluated body names so we can later index into frame transforms
         # by frame name correctly
         all_prim_paths = self._frame_physx_view.prim_paths
+
+        print(f"All Prim Paths: {all_prim_paths}")
 
         # Only need first env as the names and their ordering are the same across environments
         first_env_prim_paths = all_prim_paths[0 : len(tracked_body_names)]
@@ -252,7 +261,9 @@ class FrameTransformer(SensorBase):
         # and extract the offsets. This is all done to handles the case where multiple frames
         # reference the same body, but have different names and/or offsets
         for i, body_name in enumerate(self._target_frame_body_names):
+            print(f"Body Name: {body_name}")
             for frame in body_names_to_frames[body_name]:
+                print(f"Frame: {frame}")
                 target_frame_offset_pos.append(target_offsets[frame]["pos"])
                 target_frame_offset_quat.append(target_offsets[frame]["quat"])
                 self._target_frame_names.append(frame)
