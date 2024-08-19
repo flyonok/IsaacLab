@@ -184,9 +184,10 @@ class FrameTransformer(SensorBase):
 
                 # Keep track of which frames are associated with which bodies
                 if body_name in body_names_to_frames:
-                    body_names_to_frames[body_name].add(frame_name)
+                    body_names_to_frames[body_name]["frames"].add(frame_name)
                 else:
-                    body_names_to_frames[body_name] = {frame_name}
+                    # Store the first matching prim path
+                    body_names_to_frames[body_name] = {"frames": {frame_name}, "prim_path": matching_prim_path}
 
                 if offset is not None:
                     offset_pos = torch.tensor(offset.pos, device=self.device)
@@ -210,12 +211,27 @@ class FrameTransformer(SensorBase):
             )
 
         # The names of bodies that RigidPrimView will be tracking to later extract transforms from
-        tracked_body_names = list(body_names_to_frames.keys())
+        tracked_prim_paths = [body_names_to_frames[body_name]["prim_path"] for body_name in body_names_to_frames.keys()]
+
+        print(tracked_prim_paths)
+        
+        import os
+        common_ancestor = os.path.commonpath(tracked_prim_paths)
+        # Remove the common ancestor from the prim paths
+        tracked_body_names = [prim_path.replace(common_ancestor + "/", "") for prim_path in tracked_prim_paths]
+
+        # print(f"Common ancestor: ", common_ancestor)
+        # body_names_regex: /World/envs/env_.*/(base|cube)
+        # body_names_regex: /World/envs/env_.*/(Robot/base|cube)
+
+
+        # tracked_body_names = list(body_names_to_frames.keys())
 
         print(f"Tracked Body Names: {tracked_body_names}")
         # Construct regex expression for the body names
-        body_names_regex = r"(" + "|".join(tracked_body_names) + r")"
-        body_names_regex = f"{self.cfg.prim_path.rsplit('/', 2)[0]}/{body_names_regex}"
+        # body_names_regex = r"(" + "|".join(tracked_body_names) + r")"
+        # body_names_regex = f"{self.cfg.prim_path.rsplit('/', 2)[0]}/{body_names_regex}"
+        body_names_regex = f"/World/envs/env_.*/(Robot/base|cube)"
         print(f"body_names_regex: {body_names_regex}")
         # Create simulation view
         self._physics_sim_view = physx.create_simulation_view(self._backend)
@@ -232,7 +248,10 @@ class FrameTransformer(SensorBase):
 
         # Only need first env as the names and their ordering are the same across environments
         first_env_prim_paths = all_prim_paths[0 : len(tracked_body_names)]
+        print(f"First Env Prim Paths: {first_env_prim_paths}")
         first_env_body_names = [first_env_prim_path.split("/")[-1] for first_env_prim_path in first_env_prim_paths]
+        print(f"First Env Body Names: {first_env_body_names}")
+
 
         # Re-parse the list as it may have moved when resolving regex above
         # -- source frame
