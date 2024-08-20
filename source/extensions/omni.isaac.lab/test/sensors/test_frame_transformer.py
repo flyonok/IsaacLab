@@ -76,6 +76,18 @@ class MySceneCfg(InteractiveSceneCfg):
         init_state=RigidObjectCfg.InitialStateCfg(pos=(2.0, 0.0, 5)),
     )
 
+    # block
+    cube_2: RigidObjectCfg = RigidObjectCfg(
+        prim_path="{ENV_REGEX_NS}/cube_2",
+        spawn=sim_utils.CuboidCfg(
+            size=(0.2, 0.2, 0.2),
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(max_depenetration_velocity=1.0),
+            mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
+            physics_material=sim_utils.RigidBodyMaterialCfg(),
+            visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.5, 0.0, 0.0)),
+        ),
+        init_state=RigidObjectCfg.InitialStateCfg(pos=(2.0, 2.0, 5)),
+    )
 class TestFrameTransformer(unittest.TestCase):
     """Test for frame transformer sensor."""
 
@@ -100,121 +112,155 @@ class TestFrameTransformer(unittest.TestCase):
     Tests
     """
 
-    # def test_frame_transformer_feet_wrt_base(self):
-    #     """Test feet transformations w.r.t. base source frame.
+    def test_frame_transformer_feet_wrt_base(self):
+        """Test feet transformations w.r.t. base source frame.
 
-    #     In this test, the source frame is the robot base. This frame is at index 0, when
-    #     the frame bodies are sorted in the order of the regex matching in the frame transformer.
-    #     """
-    #     # Spawn things into stage
-    #     scene_cfg = MySceneCfg(num_envs=32, env_spacing=5.0, lazy_sensor_update=False)
-    #     scene_cfg.frame_transformer = FrameTransformerCfg(
-    #         prim_path="{ENV_REGEX_NS}/Robot/base",
-    #         target_frames=[
-    #             FrameTransformerCfg.FrameCfg(
-    #                 name="LF_FOOT_USER",
-    #                 prim_path="{ENV_REGEX_NS}/Robot/LF_SHANK",
-    #                 offset=OffsetCfg(
-    #                     pos=euler_rpy_apply(rpy=(0, 0, -math.pi / 2), xyz=(0.08795, 0.01305, -0.33797)),
-    #                     rot=quat_from_euler_rpy(0, 0, -math.pi / 2),
-    #                 ),
-    #             ),
-    #             FrameTransformerCfg.FrameCfg(
-    #                 name="RF_FOOT_USER",
-    #                 prim_path="{ENV_REGEX_NS}/Robot/RF_SHANK",
-    #                 offset=OffsetCfg(
-    #                     pos=euler_rpy_apply(rpy=(0, 0, math.pi / 2), xyz=(0.08795, -0.01305, -0.33797)),
-    #                     rot=quat_from_euler_rpy(0, 0, math.pi / 2),
-    #                 ),
-    #             ),
-    #             FrameTransformerCfg.FrameCfg(
-    #                 name="LH_FOOT_USER",
-    #                 prim_path="{ENV_REGEX_NS}/Robot/LH_SHANK",
-    #                 offset=OffsetCfg(
-    #                     pos=euler_rpy_apply(rpy=(0, 0, -math.pi / 2), xyz=(-0.08795, 0.01305, -0.33797)),
-    #                     rot=quat_from_euler_rpy(0, 0, -math.pi / 2),
-    #                 ),
-    #             ),
-    #             FrameTransformerCfg.FrameCfg(
-    #                 name="RH_FOOT_USER",
-    #                 prim_path="{ENV_REGEX_NS}/Robot/RH_SHANK",
-    #                 offset=OffsetCfg(
-    #                     pos=euler_rpy_apply(rpy=(0, 0, math.pi / 2), xyz=(-0.08795, -0.01305, -0.33797)),
-    #                     rot=quat_from_euler_rpy(0, 0, math.pi / 2),
-    #                 ),
-    #             ),
-    #         ],
-    #     )
-    #     scene = InteractiveScene(scene_cfg)
+        In this test, the source frame is the robot base. This frame is at index 0, when
+        the frame bodies are sorted in the order of the regex matching in the frame transformer.
+        """
+        # Spawn things into stage
+        scene_cfg = MySceneCfg(num_envs=2, env_spacing=5.0, lazy_sensor_update=False)
+        scene_cfg.frame_transformer = FrameTransformerCfg(
+            prim_path="{ENV_REGEX_NS}/Robot/base",
+            target_frames=[
+                FrameTransformerCfg.FrameCfg(
+                    name="LF_SHANK_USER",
+                    prim_path="{ENV_REGEX_NS}/Robot/LF_SHANK",
+                    # offset=OffsetCfg(
+                    #     pos=euler_rpy_apply(rpy=(0, 0, 0), xyz=(0.08795, 0.01305, -0.33797)),
+                    #     rot=quat_from_euler_rpy(0, 0, -math.pi / 2),
+                    # ),
+                ),
+                FrameTransformerCfg.FrameCfg(
+                    name="RF_SHANK_USER",
+                    prim_path="{ENV_REGEX_NS}/Robot/RF_SHANK",
+                    # offset=OffsetCfg(
+                    #     pos=euler_rpy_apply(rpy=(0, 0, 0), xyz=(0.08795, -0.01305, -0.33797)),
+                    #     rot=quat_from_euler_rpy(0, 0, math.pi / 2),
+                    # ),
+                ),
+                FrameTransformerCfg.FrameCfg(
+                    name="LH_SHANK_USER",
+                    prim_path="{ENV_REGEX_NS}/Robot/LH_SHANK",
+                    # offset=OffsetCfg(
+                    #     pos=euler_rpy_apply(rpy=(0, 0, 0), xyz=(-0.08795, 0.01305, -0.33797)),
+                    #     rot=quat_from_euler_rpy(0, 0, -math.pi / 2),
+                    # ),
+                ),
+                FrameTransformerCfg.FrameCfg(
+                    name="RH_SHANK_USER",
+                    prim_path="{ENV_REGEX_NS}/Robot/RH_SHANK",
+                    # offset=OffsetCfg(
+                    #     pos=euler_rpy_apply(rpy=(0, 0, 0), xyz=(-0.08795, -0.01305, -0.33797)),
+                    #     rot=quat_from_euler_rpy(0, 0, math.pi / 2),
+                    # ),
+                ),
+            ],
+        )
+        scene = InteractiveScene(scene_cfg)
 
-    #     # Play the simulator
-    #     self.sim.reset()
+        # Play the simulator
+        self.sim.reset()
 
-    #     # Acquire the index of ground truth bodies
-    #     feet_indices, feet_names = scene.articulations["robot"].find_bodies(
-    #         ["LF_FOOT", "RF_FOOT", "LH_FOOT", "RH_FOOT"]
-    #     )
-    #     # Check names are parsed the same order
-    #     user_feet_names = [f"{name}_USER" for name in feet_names]
-    #     self.assertListEqual(scene.sensors["frame_transformer"].data.target_frame_names, user_feet_names)
+        # Acquire the index of ground truth bodies
+        feet_indices, feet_names = scene.articulations["robot"].find_bodies(
+            ["LF_SHANK", "RF_SHANK", "LH_SHANK", "RH_SHANK"]
+        )
+        print(f"feet_indices: {feet_indices}")
+        print(f"feet_names: {feet_names}")
+        print(f"target_frame_names: {scene.sensors['frame_transformer'].data.target_frame_names}")
+        print(f"Bodies: ", scene.articulations["robot"].body_names)
 
-    #     # default joint targets
-    #     default_actions = scene.articulations["robot"].data.default_joint_pos.clone()
-    #     # Define simulation stepping
-    #     sim_dt = self.sim.get_physics_dt()
-    #     # Simulate physics
-    #     for count in range(100):
-    #         # # reset
-    #         if count % 25 == 0:
-    #             # reset root state
-    #             root_state = scene.articulations["robot"].data.default_root_state.clone()
-    #             root_state[:, :3] += scene.env_origins
-    #             joint_pos = scene.articulations["robot"].data.default_joint_pos
-    #             joint_vel = scene.articulations["robot"].data.default_joint_vel
-    #             # -- set root state
-    #             # -- robot
-    #             scene.articulations["robot"].write_root_state_to_sim(root_state)
-    #             scene.articulations["robot"].write_joint_state_to_sim(joint_pos, joint_vel)
-    #             # reset buffers
-    #             scene.reset()
+        target_frame_names = scene.sensors["frame_transformer"].data.target_frame_names
 
-    #         # set joint targets
-    #         robot_actions = default_actions + 0.5 * torch.randn_like(default_actions)
-    #         scene.articulations["robot"].set_joint_position_target(robot_actions)
-    #         # write data to sim
-    #         scene.write_data_to_sim()
-    #         # perform step
-    #         self.sim.step()
-    #         # read data from sim
-    #         scene.update(sim_dt)
+        # Reorder the feet indices to match the order of the target frames with _USER suffix removed
+        target_frame_names = [name.split("_USER")[0] for name in target_frame_names]
 
-    #         # check absolute frame transforms in world frame
-    #         # -- ground-truth
-    #         root_pose_w = scene.articulations["robot"].data.root_state_w[:, :7]
-    #         feet_pos_w_gt = scene.articulations["robot"].data.body_pos_w[:, feet_indices]
-    #         feet_quat_w_gt = scene.articulations["robot"].data.body_quat_w[:, feet_indices]
-    #         # -- frame transformer
-    #         source_pos_w_tf = scene.sensors["frame_transformer"].data.source_pos_w
-    #         source_quat_w_tf = scene.sensors["frame_transformer"].data.source_quat_w
-    #         feet_pos_w_tf = scene.sensors["frame_transformer"].data.target_pos_w
-    #         feet_quat_w_tf = scene.sensors["frame_transformer"].data.target_quat_w
-    #         # check if they are same
-    #         torch.testing.assert_close(root_pose_w[:, :3], source_pos_w_tf, rtol=1e-3, atol=1e-3)
-    #         torch.testing.assert_close(root_pose_w[:, 3:], source_quat_w_tf, rtol=1e-3, atol=1e-3)
-    #         torch.testing.assert_close(feet_pos_w_gt, feet_pos_w_tf, rtol=1e-3, atol=1e-3)
-    #         torch.testing.assert_close(feet_quat_w_gt, feet_quat_w_tf, rtol=1e-3, atol=1e-3)
+        # Find the indices of the feet in the order of the target frames
+        reordering_indices = [feet_names.index(name) for name in target_frame_names]
+        print(f"Reordering indices: {reordering_indices}")
+        feet_indices = [feet_indices[i] for i in reordering_indices]
 
-    #         # check if relative transforms are same
-    #         feet_pos_source_tf = scene.sensors["frame_transformer"].data.target_pos_source
-    #         feet_quat_source_tf = scene.sensors["frame_transformer"].data.target_quat_source
-    #         for index in range(len(feet_indices)):
-    #             # ground-truth
-    #             foot_pos_b, foot_quat_b = math_utils.subtract_frame_transforms(
-    #                 root_pose_w[:, :3], root_pose_w[:, 3:], feet_pos_w_tf[:, index], feet_quat_w_tf[:, index]
-    #             )
-    #             # check if they are same
-    #             torch.testing.assert_close(feet_pos_source_tf[:, index], foot_pos_b, rtol=1e-3, atol=1e-3)
-    #             torch.testing.assert_close(feet_quat_source_tf[:, index], foot_quat_b, rtol=1e-3, atol=1e-3)
+        print(f"New feet indices: {feet_indices}")
+
+        # Convert the indices to be 0 based
+        reordering_indices = torch.argsort(torch.tensor(reordering_indices)).tolist()
+
+        print(f"Zero-indexed reorderring indices: {reordering_indices}")
+
+        feet_names_reordered = [feet_names[i] for i in reordering_indices]
+        feet_names = feet_names_reordered
+
+        print(f"Feet names reordered: {feet_names}")
+
+        # default joint targets
+        default_actions = scene.articulations["robot"].data.default_joint_pos.clone()
+        # Define simulation stepping
+        sim_dt = self.sim.get_physics_dt()
+        # Simulate physics
+        for count in range(100):
+            # # reset
+            if count % 25 == 0:
+                # reset root state
+                root_state = scene.articulations["robot"].data.default_root_state.clone()
+                root_state[:, :3] += scene.env_origins
+                joint_pos = scene.articulations["robot"].data.default_joint_pos
+                joint_vel = scene.articulations["robot"].data.default_joint_vel
+                # -- set root state
+                # -- robot
+                scene.articulations["robot"].write_root_state_to_sim(root_state)
+                scene.articulations["robot"].write_joint_state_to_sim(joint_pos, joint_vel)
+                # reset buffers
+                scene.reset()
+
+            # set joint targets
+            robot_actions = default_actions + 0.5 * torch.randn_like(default_actions)
+            scene.articulations["robot"].set_joint_position_target(robot_actions)
+            # write data to sim
+            scene.write_data_to_sim()
+            # perform step
+            self.sim.step()
+            # read data from sim
+            scene.update(sim_dt)
+
+            # check absolute frame transforms in world frame
+            # -- ground-truth
+            root_pose_w = scene.articulations["robot"].data.root_state_w[:, :7]
+
+            feet_pos_w_gt = scene.articulations["robot"].data.body_pos_w[:, feet_indices]
+            feet_quat_w_gt = scene.articulations["robot"].data.body_quat_w[:, feet_indices]
+            # -- frame transformer
+            source_pos_w_tf = scene.sensors["frame_transformer"].data.source_pos_w
+            source_quat_w_tf = scene.sensors["frame_transformer"].data.source_quat_w
+            feet_pos_w_tf = scene.sensors["frame_transformer"].data.target_pos_w
+            feet_quat_w_tf = scene.sensors["frame_transformer"].data.target_quat_w
+            print(f"Order of frames in target_pos_w: {target_frame_names}")
+            print(f"Order of frames in articulation: {feet_names}")
+            print("root_pose_w position", root_pose_w[:, :3])
+            print("source_pos_w_tf position", source_pos_w_tf)
+            print("root_pose_w quaternion", root_pose_w[:, 3:])
+            print("source_quat_w_tf quaternion", source_quat_w_tf)
+            print("feet_pos_w_gt position", feet_pos_w_gt)
+            print("feet_pos_w_tf position", feet_pos_w_tf)
+            print("feet_quat_w_gt quaternion", feet_quat_w_gt)
+            print("feet_quat_w_tf quaternion", feet_quat_w_tf)
+            # check if they are same
+            torch.testing.assert_close(root_pose_w[:, :3], source_pos_w_tf, rtol=1e-3, atol=1e-3)
+            torch.testing.assert_close(root_pose_w[:, 3:], source_quat_w_tf, rtol=1e-3, atol=1e-3)
+            torch.testing.assert_close(feet_pos_w_gt, feet_pos_w_tf, rtol=1e-3, atol=1e-3)
+            torch.testing.assert_close(feet_quat_w_gt, feet_quat_w_tf, rtol=1e-3, atol=1e-3)
+
+            # check if relative transforms are same
+            feet_pos_source_tf = scene.sensors["frame_transformer"].data.target_pos_source
+            feet_quat_source_tf = scene.sensors["frame_transformer"].data.target_quat_source
+            # for index in range(len(feet_indices)):
+            #     # ground-truth
+            #     foot_pos_b, foot_quat_b = math_utils.subtract_frame_transforms(
+            #         root_pose_w[:, :3], root_pose_w[:, 3:], feet_pos_w_tf[:, index], feet_quat_w_tf[:, index]
+            #     )
+            #     # check if they are same
+            #     torch.testing.assert_close(feet_pos_source_tf[:, index], foot_pos_b, rtol=1e-3, atol=1e-3)
+            #     torch.testing.assert_close(feet_quat_source_tf[:, index], foot_quat_b, rtol=1e-3, atol=1e-3)
 
     # def test_frame_transformer_feet_wrt_thigh(self):
     #     """Test feet transformation w.r.t. thigh source frame.
@@ -315,88 +361,97 @@ class TestFrameTransformer(unittest.TestCase):
     #             torch.testing.assert_close(feet_pos_source_tf[:, index], foot_pos_b, rtol=1e-3, atol=1e-3)
     #             torch.testing.assert_close(feet_quat_source_tf[:, index], foot_quat_b, rtol=1e-3, atol=1e-3)
 
-    def test_frame_transformer_body_wrt_cube(self):
-        """Test body transformation w.r.t. base source frame.
+    # def test_frame_transformer_body_wrt_cube(self):
+    #     """Test body transformation w.r.t. base source frame.
 
-        In this test, the source frame is the robot base. This frame is at index 0, when
-        the frame bodies are sorted in the order of the regex matching in the frame transformer.
+    #     In this test, the source frame is the robot base. This frame is at index 0, when
+    #     the frame bodies are sorted in the order of the regex matching in the frame transformer.
 
-        The target_frame is a cube in the scene.
-        """
-        # Spawn things into stage
-        scene_cfg = MySceneCfg(num_envs=32, env_spacing=5.0, lazy_sensor_update=False)
-        scene_cfg.frame_transformer = FrameTransformerCfg(
-            prim_path="{ENV_REGEX_NS}/Robot/base",
-            target_frames=[
-                FrameTransformerCfg.FrameCfg(
-                    name="CUBE_USER",
-                    prim_path="{ENV_REGEX_NS}/cube",
-                ),
-            ],
-        )
-        scene = InteractiveScene(scene_cfg)
+    #     The target_frame is a cube in the scene.
+    #     """
+    #     # Spawn things into stage
+    #     scene_cfg = MySceneCfg(num_envs=2, env_spacing=5.0, lazy_sensor_update=False)
+    #     scene_cfg.frame_transformer = FrameTransformerCfg(
+    #         prim_path="{ENV_REGEX_NS}/Robot/base",
+    #         target_frames=[
+    #             FrameTransformerCfg.FrameCfg(
+    #                 name="CUBE_USER",
+    #                 prim_path="{ENV_REGEX_NS}/cube",
+    #             ),
+    #         ],
+    #     )
+    #     scene = InteractiveScene(scene_cfg)
 
-        # Play the simulator
-        self.sim.reset()
+    #     # Play the simulator
+    #     self.sim.reset()
 
-        cube_state = scene.rigid_objects["cube"].data.root_state_w
+    #     # default joint targets
+    #     default_actions = scene.articulations["robot"].data.default_joint_pos.clone()
+    #     # Define simulation stepping
+    #     sim_dt = self.sim.get_physics_dt()
+    #     # Simulate physics
+    #     for count in range(100):
+    #         # # reset
+    #         if count % 25 == 0:
+    #             # reset root state
+    #             root_state = scene.articulations["robot"].data.default_root_state.clone()
+    #             root_state[:, :3] += scene.env_origins
+    #             joint_pos = scene.articulations["robot"].data.default_joint_pos
+    #             joint_vel = scene.articulations["robot"].data.default_joint_vel
+    #             # -- set root state
+    #             # -- robot
+    #             scene.articulations["robot"].write_root_state_to_sim(root_state)
+    #             scene.articulations["robot"].write_joint_state_to_sim(joint_pos, joint_vel)
+    #             # reset buffers
+    #             scene.reset()
 
-        # default joint targets
-        default_actions = scene.articulations["robot"].data.default_joint_pos.clone()
-        # Define simulation stepping
-        sim_dt = self.sim.get_physics_dt()
-        # Simulate physics
-        for count in range(100):
-            # # reset
-            if count % 25 == 0:
-                # reset root state
-                root_state = scene.articulations["robot"].data.default_root_state.clone()
-                root_state[:, :3] += scene.env_origins
-                joint_pos = scene.articulations["robot"].data.default_joint_pos
-                joint_vel = scene.articulations["robot"].data.default_joint_vel
-                # -- set root state
-                # -- robot
-                scene.articulations["robot"].write_root_state_to_sim(root_state)
-                scene.articulations["robot"].write_joint_state_to_sim(joint_pos, joint_vel)
-                # reset buffers
-                scene.reset()
+    #         # set joint targets
+    #         robot_actions = default_actions + 0.5 * torch.randn_like(default_actions)
+    #         scene.articulations["robot"].set_joint_position_target(robot_actions)
+    #         # write data to sim
+    #         scene.write_data_to_sim()
+    #         # perform step
+    #         self.sim.step()
+    #         # read data from sim
+    #         scene.update(sim_dt)
 
-            # set joint targets
-            robot_actions = default_actions + 0.5 * torch.randn_like(default_actions)
-            scene.articulations["robot"].set_joint_position_target(robot_actions)
-            # write data to sim
-            scene.write_data_to_sim()
-            # perform step
-            self.sim.step()
-            # read data from sim
-            scene.update(sim_dt)
 
-            # # check absolute frame transforms in world frame
-            # # -- ground-truth
-            # root_pose_w = scene.articulations["robot"].data.root_state_w[:, :7]
-            # cube_pos_w_gt = scene.rigid_objects["cube"].data.root_state_w[:, :3]
-            # cube_quat_w_gt = scene.rigid_objects["cube"].data.root_state_w[:, 3:]
-            # # -- frame transformer
-            # source_pos_w_tf = scene.sensors["frame_transformer"].data.source_pos_w
-            # source_quat_w_tf = scene.sensors["frame_transformer"].data.source_quat_w
-            # cube_pos_w_tf = scene.sensors["frame_transformer"].data.target_pos_w
-            # cube_quat_w_tf = scene.sensors["frame_transformer"].data.target_quat_w
-            # # check if they are same
-            # torch.testing.assert_close(root_pose_w[:, :3], source_pos_w_tf, rtol=1e-3, atol=1e-3)
-            # torch.testing.assert_close(root_pose_w[:, 3:], source_quat_w_tf, rtol=1e-3, atol=1e-3)
-            # torch.testing.assert_close(cube_pos_w_gt, cube_pos_w_tf, rtol=1e-3, atol=1e-3)
-            # torch.testing.assert_close(cube_quat_w_gt, cube_quat_w_tf, rtol=1e-3, atol=1e-3)
+    #         # check absolute frame transforms in world frame
+    #         # -- ground-truth
+    #         root_pose_w = scene.articulations["robot"].data.root_state_w[:, :7]
+    #         cube_pos_w_gt = scene.rigid_objects["cube"].data.root_state_w[:, :3]
+    #         cube_quat_w_gt = scene.rigid_objects["cube"].data.root_state_w[:, 3:7]
+    #         # -- frame transformer
+    #         source_pos_w_tf = scene.sensors["frame_transformer"].data.source_pos_w
+    #         source_quat_w_tf = scene.sensors["frame_transformer"].data.source_quat_w
+    #         cube_pos_w_tf = scene.sensors["frame_transformer"].data.target_pos_w.squeeze()
+    #         cube_quat_w_tf = scene.sensors["frame_transformer"].data.target_quat_w.squeeze()
 
-            # # check if relative transforms are same
-            # cube_pos_source_tf = scene.sensors["frame_transformer"].data.target_pos_source
-            # cube_quat_source_tf = scene.sensors["frame_transformer"].data.target_quat_source
-            # # ground-truth
-            # cube_pos_b, cube_quat_b = math_utils.subtract_frame_transforms(
-            #     root_pose_w[:, :3], root_pose_w[:, 3:], cube_pos_w_tf[:, 0], cube_quat_w_tf[:, 0]
-            # )
-            # # check if they are same
-            # torch.testing.assert_close(cube_pos_source_tf[:, 0], cube_pos_b, rtol=1e-3, atol=1e-3)
-            # torch.testing.assert_close(cube_quat_source_tf[:, 0], cube_quat_b, rtol=1e-3, atol=1e-3)
+    #         print("root_pose_w position", root_pose_w[:, :3])
+    #         print("source_pos_w_tf position", source_pos_w_tf)
+    #         print("root_pose_w quaternion", root_pose_w[:, 3:])
+    #         print("source_quat_w_tf quaternion", source_quat_w_tf)
+    #         print("cube_pos_w_gt position", cube_pos_w_gt)
+    #         print("cube_pos_w_tf position", cube_pos_w_tf)
+    #         print("cube_quat_w_gt quaternion", cube_quat_w_gt)
+    #         print("cube_quat_w_tf quaternion", cube_quat_w_tf)
+
+    #         # check if they are same
+    #         torch.testing.assert_close(root_pose_w[:, :3], source_pos_w_tf, rtol=1e-3, atol=1e-3)
+    #         torch.testing.assert_close(root_pose_w[:, 3:], source_quat_w_tf, rtol=1e-3, atol=1e-3)
+    #         torch.testing.assert_close(cube_pos_w_gt, cube_pos_w_tf, rtol=1e-3, atol=1e-3)
+    #         torch.testing.assert_close(cube_quat_w_gt, cube_quat_w_tf, rtol=1e-3, atol=1e-3)
+
+    #         # check if relative transforms are same
+    #         cube_pos_source_tf = scene.sensors["frame_transformer"].data.target_pos_source
+    #         cube_quat_source_tf = scene.sensors["frame_transformer"].data.target_quat_source
+    #         # ground-truth
+    #         cube_pos_b, cube_quat_b = math_utils.subtract_frame_transforms(
+    #             root_pose_w[:, :3], root_pose_w[:, 3:], cube_pos_w_tf, cube_quat_w_tf
+    #         )
+    #         # check if they are same
+    #         torch.testing.assert_close(cube_pos_source_tf[:, 0], cube_pos_b, rtol=1e-3, atol=1e-3)
+    #         torch.testing.assert_close(cube_quat_source_tf[:, 0], cube_quat_b, rtol=1e-3, atol=1e-3)
 
 if __name__ == "__main__":
     run_tests()
